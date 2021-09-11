@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christos Maris clerk.dev assignment</title>
+
+  <style>
+    body {
+      margin: 0;
+      width: 100vw;
+    }
+
+    #app {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    fieldset {
+      align-items: center;
+      display: flex;
+      width: fit-content;
+    }
+
+    fieldset>legend {
+      padding: 0 7px;
+    }
+
+    fieldset>input:first-of-type {
+      margin-right: 10px;
+    }
+
+    #card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      list-style: none;
+    }
+
+    .card {
+      align-items: center;
+      background-color: teal;
+      border: 2px solid;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 1;
+      margin: 30px 15px 0;
+      padding: 10px;
+      width: 250px;
+    }
+
+    .card>* {
+      margin: 15px 0;
+    }
+
+    .card>img {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h1>My Clerks</h1>
+
+    <fieldset>
+      <legend>Card Background Color</legend>
+      <input type="text" id="color-picker-text">
+      <input type="color" id="color-picker-button">
+    </fieldset>
+
+    <div id="card-container">
+      <div class="card">
+        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+        <h2>Kirsten Something</h2>
+        <p>Street name and number</p>
+        <p>email@example.com</p>
+        <p>+1-500-MY-NUMBER</p>
+      </div>
+      <div class="card">
+        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+        <h2>Kirsten Something</h2>
+        <p>Street name and number</p>
+        <p>email@example.com</p>
+        <p>+1-500-MY-NUMBER</p>
+      </div>
+      <div class="card">
+        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+        <h2>Kirsten Something</h2>
+        <p>Street name and number</p>
+        <p>email@example.com</p>
+        <p>+1-500-MY-NUMBER</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
