@@ -68,8 +68,8 @@
 
     <fieldset>
       <legend>Card Background Color</legend>
-      <input type="text" id="color-picker-text">
-      <input type="color" id="color-picker-button">
+      <input type="text" id="color-picker-text" oninput="App.backgroundColorChange('text');">
+      <input type="color" id="color-picker-button" oninput="App.backgroundColorChange('button');">
     </fieldset>
 
     <div id="card-container">
@@ -96,6 +96,47 @@
       </div>
     </div>
   </div>
+
+  <script>
+    const App = {};
+
+    App.stateChangeHandler = {
+      set: function (state, key, value) {
+        state[key] = value;
+        App.rerender();
+      },
+    };
+
+    App.state = new Proxy({}, App.stateChangeHandler);
+
+    App.rerender = function () {
+      console.log(this.state);
+    };
+
+    App.validate = ({
+      backgroundColor,
+    }) => {
+      if (backgroundColor) {
+        return /^#[0-9a-fA-F]{6}$/.exec(backgroundColor);
+      }
+    };
+
+    App.backgroundColorChange = inputType => {
+      const inputId = `color-picker-${inputType}`;
+      const backgroundColor = document.getElementById(inputId).value;
+
+      App.state.backgroundColor =
+        App.validate({ backgroundColor })
+          ? backgroundColor
+          : false;
+    };
+
+    // Helps us avoid shooting ourselves in the foot.
+    Object.freeze(App);
+
+    // Initial App render
+    // App.rerender();
+  </script>
 </body>
 
 </html>
