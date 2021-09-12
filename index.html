@@ -42,7 +42,6 @@
 
     .card {
       align-items: center;
-      background-color: teal;
       border: 2px solid;
       display: flex;
       flex-direction: column;
@@ -66,6 +65,27 @@
   <div id="app">loading...</div>
 
   <script>
+    class BackgroundColor {
+      constructor(hex) {
+        // Input hex
+        this.hex = hex;
+
+        // Contrast hex: black | white;
+        // Logic adapted from: https://css-tricks.com/css-variables-calc-rgb-enforcing-high-contrast-colors/
+        const rgb = hex.replace('#', '').match(/.{2}/g).map(intensity => parseInt(intensity, 16));
+        const sum = (
+          (rgb[0] * 299) +
+          (rgb[1] * 587) +
+          (rgb[2] * 114)
+        ) / 1000;
+
+        this.contrastHex =
+          sum > 128
+            ? '#000000'
+            : '#ffffff';
+      }
+    };
+
     const App = {};
 
     App.stateChangeHandler = {
@@ -80,7 +100,7 @@
     };
 
     App.state = new Proxy(
-      JSON.parse(localStorage.state ||= JSON.stringify({ backgroundColor: '#007e7e' })),
+      JSON.parse(localStorage.state ||= JSON.stringify({ backgroundColor: new BackgroundColor('#007e7e') })),
       App.stateChangeHandler
     );
 
@@ -88,44 +108,31 @@
       const html = `
         <h1>My Clerks</h1>
 
-        <fieldset>
+        <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
           <legend>Card Background Color</legend>
-          <input
-            type="text"
-            id="color-picker-text"
-            onchange="App.backgroundColorChange('text');"
-            value=${App.state.backgroundColor}
-          >
-          <input
-            type="color"
-            id="color-picker-button"
-            onchange="App.backgroundColorChange('button');"
-            value=${App.state.backgroundColor}
-          >
+          ${['text', 'color'].map(inputType => `
+            <input
+              type="${inputType}"
+              id="color-picker-${inputType}"
+              onchange="App.backgroundColorChange('${inputType}');"
+              value=${App.state.backgroundColor.hex}
+            >
+          `).join('')}
         </fieldset>
 
         <div id="card-container">
-          <div class="card">
-            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-            <h2>Kirsten Something</h2>
-            <p>Street name and number</p>
-            <p>email@example.com</p>
-            <p>+1-500-MY-NUMBER</p>
-          </div>
-          <div class="card">
-            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-            <h2>Kirsten Something</h2>
-            <p>Street name and number</p>
-            <p>email@example.com</p>
-            <p>+1-500-MY-NUMBER</p>
-          </div>
-          <div class="card">
-            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-            <h2>Kirsten Something</h2>
-            <p>Street name and number</p>
-            <p>email@example.com</p>
-            <p>+1-500-MY-NUMBER</p>
-          </div>
+          ${[0, 1, 2].map(() => `
+            <div
+              class="card"
+              style="background-color: ${App.state.backgroundColor.hex}; color: ${App.state.backgroundColor.contrastHex};"
+            >
+              <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+              <h2>Kirsten Something</h2>
+              <p>Street name and number</p>
+              <p>email@example.com</p>
+              <p>+1-500-MY-NUMBER</p>
+            </div>
+          `).join('')}
         </div>
       `;
 
@@ -133,21 +140,21 @@
     };
 
     App.validate = ({
-      backgroundColor,
+      hexColor,
     }) => {
-      if (backgroundColor) {
-        return /^#[0-9a-fA-F]{6}$/.exec(backgroundColor);
+      if (hexColor) {
+        return /^#[0-9a-fA-F]{6}$/.exec(hexColor);
       }
     };
 
     App.backgroundColorChange = inputType => {
       const inputId = `color-picker-${inputType}`;
-      const backgroundColor = document.getElementById(inputId).value;
+      const inputValue = document.getElementById(inputId).value;
 
-      App.state.backgroundColor =
-        App.validate({ backgroundColor })
-          ? backgroundColor
-          : false;
+      App.state.fromObject =
+        App.validate({ hexColor: inputValue })
+          ? { backgroundColorError: false, backgroundColor: new BackgroundColor(inputValue) }
+          : { backgroundColorError: true };
     };
 
     // Helps us avoid shooting ourselves in the foot.
