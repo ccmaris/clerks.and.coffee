@@ -19,6 +19,16 @@
       flex-direction: column;
     }
 
+    #menu-container {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
+
+    #menu-container> :nth-child(2) {
+      margin: 0 10px
+    }
+
     fieldset {
       align-items: center;
       display: flex;
@@ -34,6 +44,7 @@
     }
 
     #card-container {
+      align-items: center;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -46,6 +57,7 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 1;
+      height: 380px;
       margin: 30px 15px 0;
       padding: 10px;
       width: 250px;
@@ -58,6 +70,30 @@
     .card>img {
       border-radius: 50%;
     }
+
+    .card>h2 {
+      font-size: 1.25rem;
+    }
+
+    .arrow-button {
+      height: fit-content;
+      width: auto;
+    }
+
+    .arrow-icon {
+      border-style: dotted;
+      border-width: 0 3px 3px 0;
+      display: inline-block;
+      padding: 3px;
+    }
+
+    .arrow-icon.right {
+      transform: rotate(-45deg);
+    }
+
+    .arrow-icon.left {
+      transform: rotate(135deg);
+    }
   </style>
 </head>
 
@@ -65,6 +101,7 @@
   <div id="app">loading...</div>
 
   <script>
+    // Helpers
     class BackgroundColor {
       constructor(hex) {
         // Input hex
@@ -86,6 +123,19 @@
       }
     };
 
+    const offsetPage = (currentPage, offset) => {
+      let nextPage = (currentPage + offset) % 10;
+      if (nextPage === 0) {
+        nextPage =
+          offset === 1
+            ? 1
+            : 9;
+      }
+
+      return nextPage;
+    };
+
+    // Actual App "framework"
     const App = {};
 
     App.stateChangeHandler = {
@@ -108,7 +158,9 @@
       App.stateChangeHandler
     );
 
-    App.fetchPage = (pageIndex, microTaskQueue = false) => {
+    App.fetchPage = pageIndex => {
+      if (App.state.pages[pageIndex]) return;
+
       const fetcherFunction = () => {
         fetch(`https://randomuser.me/api/?seed=clerk&results=3&page=${pageIndex}`)
           .then(r => r.json(), console.error)
@@ -140,11 +192,7 @@
           });
       };
 
-      if (microTaskQueue) {
-        setTimeout(fetcherFunction, 0);
-      } else {
-        fetcherFunction();
-      }
+      fetcherFunction();
     };
 
     App.rerender = function () {
@@ -156,17 +204,35 @@
       const html = `
         <h1>My Clerks</h1>
 
-        <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
-          <legend>Card Background Color</legend>
-          ${['text', 'color'].map(inputType => `
-            <input
-              type="${inputType}"
-              id="color-picker-${inputType}"
-              onchange="App.backgroundColorChange('${inputType}');"
-              value=${App.state.backgroundColor.hex}
-            >
-          `).join('')}
-        </fieldset>
+        <div id="menu-container">
+          <button
+            class="arrow-button"
+            style="background-color: ${App.state.backgroundColor.hex};"
+            onclick="App.pageTurn(-1);"
+          >
+            <i class="arrow-icon left" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
+          </button>
+
+          <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
+            <legend>Card Background Color</legend>
+            ${['text', 'color'].map(inputType => `
+              <input
+                type="${inputType}"
+                id="color-picker-${inputType}"
+                onchange="App.backgroundColorChange('${inputType}');"
+                value=${App.state.backgroundColor.hex}
+              >
+            `).join('')}
+          </fieldset>
+
+          <button
+            class="arrow-button"
+            style="background-color: ${App.state.backgroundColor.hex};"
+            onclick="App.pageTurn(+1);"
+          >
+            <i class="arrow-icon right" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
+          </button>
+        </div>
 
         <div id="card-container">
           ${App.state.pages[App.state.currentPage].map(person => `
@@ -205,6 +271,9 @@
           : { backgroundColorError: true };
     };
 
+    App.pageTurn = offset => {
+      App.state.currentPage = offsetPage(App.state.currentPage, offset);
+    };
     // Helps us avoid shooting ourselves in the foot.
     Object.freeze(App);
 
