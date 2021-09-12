@@ -102,12 +102,57 @@
       },
     };
 
+    const initialState = { backgroundColor: new BackgroundColor('#007e7e'), currentPage: 1, pages: {} };
     App.state = new Proxy(
-      JSON.parse(localStorage.state ||= JSON.stringify({ backgroundColor: new BackgroundColor('#007e7e') })),
+      JSON.parse(localStorage.state ||= JSON.stringify(initialState)),
       App.stateChangeHandler
     );
 
+    App.fetchPage = (pageIndex, microTaskQueue = false) => {
+      const fetcherFunction = () => {
+        fetch(`https://randomuser.me/api/?seed=clerk&results=3&page=${pageIndex}`)
+          .then(r => r.json(), console.error)
+          .then(data => {
+            const page = data.results.map(({ name, location, email, phone, picture: { large } }) => {
+              const fullName = [
+                name.title,
+                name.first,
+                name.last,
+              ].join(' ');
+
+              const address = [
+                location.street.number,
+                location.street.name,
+              ].join(' ');
+
+              return { fullName, address, email, phone, picture: large };
+            });
+
+            const pageObject = {};
+            pageObject[pageIndex] = page;
+
+            App.state.fromObject = {
+              pages: {
+                ...App.state.pages,
+                ...pageObject,
+              }
+            };
+          });
+      };
+
+      if (microTaskQueue) {
+        setTimeout(fetcherFunction, 0);
+      } else {
+        fetcherFunction();
+      }
+    };
+
     App.rerender = function () {
+      if (!App.state.pages[App.state.currentPage]) {
+        App.fetchPage(App.state.currentPage);
+        return;
+      }
+
       const html = `
         <h1>My Clerks</h1>
 
@@ -124,16 +169,16 @@
         </fieldset>
 
         <div id="card-container">
-          ${[0, 1, 2].map(() => `
+          ${App.state.pages[App.state.currentPage].map(person => `
             <div
               class="card"
               style="background-color: ${App.state.backgroundColor.hex}; color: ${App.state.backgroundColor.contrastHex};"
             >
-              <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-              <h2>Kirsten Something</h2>
-              <p>Street name and number</p>
-              <p>email@example.com</p>
-              <p>+1-500-MY-NUMBER</p>
+              <img src="${person.picture}" alt="Profile picture of ${person.fullName}" />
+              <h2>${person.fullName}</h2>
+              <p>${person.address}</p>
+              <p>${person.email}</p>
+              <p>${person.phone}</p>
             </div>
           `).join('')}
         </div>
