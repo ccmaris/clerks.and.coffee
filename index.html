@@ -71,13 +71,16 @@
     App.stateChangeHandler = {
       set: function (state, key, value) {
         state[key] = value;
+        localStorage.state = JSON.stringify(state);
+
         App.rerender();
       },
     };
 
-    App.state = new Proxy({
-      backgroundColor: '#000000',
-    }, App.stateChangeHandler);
+    App.state = new Proxy(
+      JSON.parse(localStorage.state ||= JSON.stringify({ backgroundColor: '#007e7e' })),
+      App.stateChangeHandler
+    );
 
     App.rerender = function () {
       const html = `
