@@ -63,39 +63,7 @@
 </head>
 
 <body>
-  <div id="app">
-    <h1>My Clerks</h1>
-
-    <fieldset>
-      <legend>Card Background Color</legend>
-      <input type="text" id="color-picker-text" oninput="App.backgroundColorChange('text');">
-      <input type="color" id="color-picker-button" oninput="App.backgroundColorChange('button');">
-    </fieldset>
-
-    <div id="card-container">
-      <div class="card">
-        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-        <h2>Kirsten Something</h2>
-        <p>Street name and number</p>
-        <p>email@example.com</p>
-        <p>+1-500-MY-NUMBER</p>
-      </div>
-      <div class="card">
-        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-        <h2>Kirsten Something</h2>
-        <p>Street name and number</p>
-        <p>email@example.com</p>
-        <p>+1-500-MY-NUMBER</p>
-      </div>
-      <div class="card">
-        <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
-        <h2>Kirsten Something</h2>
-        <p>Street name and number</p>
-        <p>email@example.com</p>
-        <p>+1-500-MY-NUMBER</p>
-      </div>
-    </div>
-  </div>
+  <div id="app">loading...</div>
 
   <script>
     const App = {};
@@ -107,10 +75,56 @@
       },
     };
 
-    App.state = new Proxy({}, App.stateChangeHandler);
+    App.state = new Proxy({
+      backgroundColor: '#000000',
+    }, App.stateChangeHandler);
 
     App.rerender = function () {
-      console.log(this.state);
+      const html = `
+        <h1>My Clerks</h1>
+
+        <fieldset>
+          <legend>Card Background Color</legend>
+          <input
+            type="text"
+            id="color-picker-text"
+            onchange="App.backgroundColorChange('text');"
+            value=${App.state.backgroundColor}
+          >
+          <input
+            type="color"
+            id="color-picker-button"
+            onchange="App.backgroundColorChange('button');"
+            value=${App.state.backgroundColor}
+          >
+        </fieldset>
+
+        <div id="card-container">
+          <div class="card">
+            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+            <h2>Kirsten Something</h2>
+            <p>Street name and number</p>
+            <p>email@example.com</p>
+            <p>+1-500-MY-NUMBER</p>
+          </div>
+          <div class="card">
+            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+            <h2>Kirsten Something</h2>
+            <p>Street name and number</p>
+            <p>email@example.com</p>
+            <p>+1-500-MY-NUMBER</p>
+          </div>
+          <div class="card">
+            <img src="https://randomuser.me/api/portraits/women/10.jpg" alt="Profile picture of Marie Cole" />
+            <h2>Kirsten Something</h2>
+            <p>Street name and number</p>
+            <p>email@example.com</p>
+            <p>+1-500-MY-NUMBER</p>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('app').innerHTML = html;
     };
 
     App.validate = ({
@@ -135,7 +149,7 @@
     Object.freeze(App);
 
     // Initial App render
-    // App.rerender();
+    App.rerender();
   </script>
 </body>
 
