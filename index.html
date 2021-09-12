@@ -166,7 +166,7 @@
       App.stateChangeHandler
     );
 
-    App.fetchPage = pageIndex => {
+    App.fetchPage = (pageIndex, isPrefetch = false) => {
       if (App.state.pages[pageIndex]) return;
 
       const fetcherFunction = () => {
@@ -197,6 +197,20 @@
                 ...pageObject,
               }
             };
+
+            // Prefetch adjacent pages and images
+            if (isPrefetch) {
+              page.forEach(({ picture }) => {
+                // This is enough to prefetch and cache an image
+                const prefetchImage = new Image();
+                prefetchImage.src = picture;
+              });
+            }
+
+            setTimeout(() => {
+              App.fetchPage(offsetPage(pageIndex, 1), true);
+              App.fetchPage(offsetPage(pageIndex, -1), true);
+            }, 0);
           });
       };
 
