@@ -229,6 +229,7 @@
 
           <div id="menu-container">
             <button
+              aria-label="Visit previous page"
               class="arrow-button"
               style="background-color: ${App.state.backgroundColor.hex};"
               onclick="App.pageTurn(-1);"
@@ -240,15 +241,17 @@
               <legend>Card Background Color</legend>
               ${['text', 'color'].map(inputType => `
                 <input
+                  aria-label="Color input in the form of ${inputType === 'text' ? 'hex text' : 'color picker'}"
                   type="${inputType}"
                   id="color-picker-${inputType}"
                   onchange="App.backgroundColorChange('${inputType}');"
                   value=${App.state.backgroundColor.hex}
-                >
+                  >
               `).join('')}
             </fieldset>
 
             <button
+              aria-label="Visit next page"
               class="arrow-button"
               style="background-color: ${App.state.backgroundColor.hex};"
               onclick="App.pageTurn(+1);"
