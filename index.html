@@ -70,7 +70,9 @@
 
     App.stateChangeHandler = {
       set: function (state, key, value) {
-        state[key] = value;
+        key === 'fromObject'
+          ? Object.assign(state, value)
+          : state[key] = value;
         localStorage.state = JSON.stringify(state);
 
         App.rerender();
