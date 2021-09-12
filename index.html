@@ -13,10 +13,14 @@
       width: 100vw;
     }
 
-    #app {
+    header {
       align-items: center;
+      background-color: white;
       display: flex;
       flex-direction: column;
+      padding-bottom: 15px;
+      position: sticky;
+      top: 0;
     }
 
     #menu-container {
@@ -37,6 +41,10 @@
 
     fieldset>legend {
       padding: 0 7px;
+    }
+
+    #color-picker-text {
+      width: 100px;
     }
 
     fieldset>input:first-of-type {
@@ -202,37 +210,39 @@
       }
 
       const html = `
-        <h1>My Clerks</h1>
+        <header>
+          <h1>My Clerks</h1>
 
-        <div id="menu-container">
-          <button
-            class="arrow-button"
-            style="background-color: ${App.state.backgroundColor.hex};"
-            onclick="App.pageTurn(-1);"
-          >
-            <i class="arrow-icon left" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
-          </button>
+          <div id="menu-container">
+            <button
+              class="arrow-button"
+              style="background-color: ${App.state.backgroundColor.hex};"
+              onclick="App.pageTurn(-1);"
+            >
+              <i class="arrow-icon left" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
+            </button>
 
-          <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
-            <legend>Card Background Color</legend>
-            ${['text', 'color'].map(inputType => `
-              <input
-                type="${inputType}"
-                id="color-picker-${inputType}"
-                onchange="App.backgroundColorChange('${inputType}');"
-                value=${App.state.backgroundColor.hex}
-              >
-            `).join('')}
-          </fieldset>
+            <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
+              <legend>Card Background Color</legend>
+              ${['text', 'color'].map(inputType => `
+                <input
+                  type="${inputType}"
+                  id="color-picker-${inputType}"
+                  onchange="App.backgroundColorChange('${inputType}');"
+                  value=${App.state.backgroundColor.hex}
+                >
+              `).join('')}
+            </fieldset>
 
-          <button
-            class="arrow-button"
-            style="background-color: ${App.state.backgroundColor.hex};"
-            onclick="App.pageTurn(+1);"
-          >
-            <i class="arrow-icon right" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
-          </button>
-        </div>
+            <button
+              class="arrow-button"
+              style="background-color: ${App.state.backgroundColor.hex};"
+              onclick="App.pageTurn(+1);"
+            >
+              <i class="arrow-icon right" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
+            </button>
+          </div>
+        </header>
 
         <div id="card-container">
           ${App.state.pages[App.state.currentPage].map(person => `
