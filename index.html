@@ -90,12 +90,15 @@
 
     App.stateChangeHandler = {
       set: function (state, key, value) {
+        const shouldRerender = !key.includes('NoRerender');
+        key = key.replace('NoRerender', '');
+
         key === 'fromObject'
           ? Object.assign(state, value)
           : state[key] = value;
         localStorage.state = JSON.stringify(state);
 
-        App.rerender();
+        if (shouldRerender) App.rerender();
       },
     };
 
