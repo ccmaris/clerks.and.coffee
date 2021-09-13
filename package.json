@@ -4,6 +4,11 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "open index.html"
+    "start": "open index.html",
+    "test": "cypress open",
+    "test:ci": "cypress run --headless"
+  },
+  "dependencies": {
+    "cypress": "^8.3.1"
   }
 }

@@ -201,16 +201,20 @@
               }
             };
 
-            // Prefetch adjacent pages and images
-            if (isPrefetch) {
-              page.forEach(({ picture }) => {
-                // This is enough to prefetch and cache an image
-                const prefetchImage = new Image();
-                prefetchImage.src = picture;
-              });
-            }
 
+            // Prefetch adjacent pages and images
             setTimeout(() => {
+              // Disable prefetching on test env, for faster test completion
+              if (App.isTesting) return;
+
+              if (isPrefetch) {
+                page.forEach(({ picture }) => {
+                  // This is enough to prefetch and cache an image
+                  const prefetchImage = new Image();
+                  prefetchImage.src = picture;
+                });
+              }
+
               App.fetchPage(offsetPage(pageIndex, 1), true);
               App.fetchPage(offsetPage(pageIndex, -1), true);
             }, 0);
@@ -227,27 +231,32 @@
       }
 
       const html = `
-        <header>
+        <header data-cy="header">
           <h1>My Clerks</h1>
 
           <div id="menu-container">
             <button
               aria-label="Visit previous page"
               class="arrow-button"
+              data-cy="button-previous"
               style="background-color: ${App.state.backgroundColor.hex};"
               onclick="App.pageTurn(-1);"
             >
               <i class="arrow-icon left" style="border-color: ${App.state.backgroundColor.contrastHex}"></i>
             </button>
 
-            <fieldset style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};">
+            <fieldset
+              data-cy="fieldset"
+              style="border: ${App.state.backgroundColorError ? '4px solid red' : '2px solid black'};"
+            >
               <legend>Card Background Color</legend>
               ${['text', 'color'].map(inputType => `
                 <input
                   aria-label="Color input in the form of ${inputType === 'text' ? 'hex text' : 'color picker'}"
-                  type="${inputType}"
                   id="color-picker-${inputType}"
+                  data-cy="input-${inputType}"
                   onchange="App.backgroundColorChange('${inputType}');"
+                  type="${inputType}"
                   value=${App.state.backgroundColor.hex}
                   >
               `).join('')}
@@ -256,6 +265,7 @@
             <button
               aria-label="Visit next page"
               class="arrow-button"
+              data-cy="button-next"
               style="background-color: ${App.state.backgroundColor.hex};"
               onclick="App.pageTurn(+1);"
             >
@@ -264,10 +274,11 @@
           </div>
         </header>
 
-        <div id="card-container">
-          ${App.state.pages[App.state.currentPage].map(person => `
+        <div data-cy="page-${App.state.currentPage}" id="card-container">
+          ${App.state.pages[App.state.currentPage].map((person, index) => `
             <div
               class="card"
+              data-cy="card-${index}"
               style="background-color: ${App.state.backgroundColor.hex}; color: ${App.state.backgroundColor.contrastHex};"
             >
               <img src="${person.picture}" alt="Profile picture of ${person.fullName}" />
@@ -304,6 +315,9 @@
     App.pageTurn = offset => {
       App.state.currentPage = offsetPage(App.state.currentPage, offset);
     };
+
+    App.isTesting = () => location.search.includes('test=true');
+
     // Helps us avoid shooting ourselves in the foot.
     Object.freeze(App);
 
