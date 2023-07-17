@@ -205,7 +205,7 @@
             // Prefetch adjacent pages and images
             setTimeout(() => {
               // Disable prefetching on test env, for faster test completion
-              if (App.isTesting) return;
+              if (App.isTesting()) return;
 
               if (isPrefetch) {
                 page.forEach(({ picture }) => {
